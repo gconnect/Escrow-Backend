@@ -1,0 +1,28 @@
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Param,
+  Patch,
+} from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { AuthEntity } from './entities/auth.entity';
+import { LoginDto } from './dto/login.dto';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { UpdateAuthDto } from './dto/update-auth.dto';
+
+@Controller('auth')
+@ApiTags('auth')
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Post('login')
+  @ApiOkResponse({ type: AuthEntity })
+  login(@Body() { email, password }: LoginDto) {
+    return this.authService.login(email, password);
+  }
+}

@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model Article {
+//   id          Int      @id @default(autoincrement())
+//   title       String   @unique
+//   description String?
+//   body        String
+//   published   Boolean  @default(false)
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+//   author      User?    @relation(fields: [authorId], references: [id])
+//   authorId    Int?
+// }
+
+// model User {
+//   id        Int       @id @default(autoincrement())
+//   name      String?
+//   email     String    @unique
+//   password  String
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   articles  Article[]
+// }
+
+model UserEOAAccount {
+  id                 Int    @id @default(autoincrement())
+  eoaAddress         String 
+  privateKey         String
+  smartWalletAddress String?
+  userId             Int?   @unique
+  user               User?  @relation(fields: [userId], references: [id], onDelete: Cascade) //deletes this table data alongside the user
+}
+
+model User {
+  id                 Int             @id @default(autoincrement())
+  username           String          @unique
+  email              String          @unique
+  password           String
+  eoaAccount         UserEOAAccount?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  clientRequests     Request[]       @relation("ClientRequests")
+  freelancerRequests Request[]       @relation("FreelancerRequests")
+}
+
+enum RequestStatus {
+  PENDING
+  ACTIVE
+  INPROGRESS
+  COMPLETED
+  REJECTED
+}
+
+model Milestone {
+  id          Int     @id @default(autoincrement())
+  description String
+  percent     Int
+  requestId   Int
+  request     Request @relation(fields: [requestId], references: [id])
+}
+
+model Request {
+  id                 Int           @id @default(autoincrement())
+  serviceType        String
+  projectDescription String
+  additionalDocLinks String[]
+  isMilestone        Boolean       @default(false)
+  definitionOfDone   String
+  revisions          Int
+  amount             Float
+  completionDate     DateTime
+  status             RequestStatus @default(PENDING)
+  clientId           Int           
+  freelancerId       Int           
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  client             User          @relation("ClientRequests", fields: [clientId], references: [id])
+  freelancer         User          @relation("FreelancerRequests", fields: [freelancerId], references: [id])
+  milestones         Milestone[]
+}
