@@ -26,6 +26,7 @@ import { RequestEntity } from './entities/request.entity';
 import { UpdateRequestDto } from './dtos/update-request.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RequestsService } from './requests.service';
+import { AdminGuard } from 'src/utils/admin.guard';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -63,9 +64,6 @@ export class RequestsController {
   }
 
   // update a request
-
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
   @Patch(':id')
   @ApiOkResponse({
     type: RequestEntity,
@@ -88,8 +86,9 @@ export class RequestsController {
   }
 
   // delete all request
-  @Delete()
+  @UseGuards(AdminGuard)
   @ApiOkResponse({ type: RequestEntity })
+  @Delete()
   async removeAll() {
     return this.requestsService.removeAll();
   }

@@ -22,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateMilestoneDto } from 'src/milestones/dtos/create-milestone.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AdminGuard } from 'src/utils/admin.guard';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -82,6 +83,7 @@ export class MilestonesController {
   }
 
   // delete all request
+  @UseGuards(AdminGuard)
   @Delete()
   @ApiOkResponse({ type: MilestoneEntity })
   async removeAll() {

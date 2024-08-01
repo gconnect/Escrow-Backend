@@ -21,6 +21,8 @@ import {
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RequestEntity } from 'src/requests/entities/request.entity';
+import { AdminGuard } from 'src/utils/admin.guard';
 
 @Controller('users')
 @ApiTags('users')
@@ -68,5 +70,13 @@ export class UsersController {
   @ApiOkResponse({ type: UserEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.usersService.remove(id);
+  }
+
+  // delete all request
+  @UseGuards(AdminGuard)
+  @ApiOkResponse({ type: UserEntity })
+  @Delete()
+  async removeAll() {
+    return this.usersService.removeAll();
   }
 }
