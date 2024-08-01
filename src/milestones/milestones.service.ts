@@ -7,15 +7,18 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMilestoneDto } from 'src/milestones/dtos/create-milestone.dto';
 import { MilestoneEntity } from 'src/milestones/entities/milestone.entity';
-import { RequestService } from 'src/request/request.service';
+import { RequestsService } from 'src/requests/requests.service';
 
 @Injectable()
 export class MilestonesService {
-  constructor(private prisma: PrismaService, private request: RequestService) {}
+  constructor(
+    private prisma: PrismaService,
+    private requests: RequestsService,
+  ) {}
 
   // Add more request-related methods as needed
   async create(createMilestonDto: CreateMilestoneDto) {
-    const requests = await this.request.findAll();
+    const requests = await this.requests.findAll();
     const request = requests.find(
       (request) => request.id == createMilestonDto.requestId,
     );

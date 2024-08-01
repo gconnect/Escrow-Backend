@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateRequestDto } from './dto/create-request.dto';
+import { CreateRequestDto } from './dtos/create-request.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { MilestoneEntity } from '../milestones/entities/milestone.entity';
-import { RequestEntity } from '../request/entities/request.entity';
+import { RequestEntity } from './entities/request.entity';
 
 @Injectable()
-export class RequestService {
+export class RequestsService {
   constructor(private prisma: PrismaService) {}
 
   // Add more request-related methods as needed
@@ -19,7 +19,7 @@ export class RequestService {
         ...createRequestDto,
       },
     });
-    new RequestEntity(request);
+    return new RequestEntity(request);
   }
 
   async findAll() {

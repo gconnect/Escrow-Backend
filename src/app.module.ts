@@ -4,16 +4,16 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { RequestModule } from './request/request.module';
 import { MilestonesModule } from './milestones/milestones.module';
+import { RequestsModule } from './requests/requests.module';
 
 @Module({
   imports: [
     PrismaModule,
     UsersModule,
     AuthModule,
-    RequestModule,
     MilestonesModule,
+    RequestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

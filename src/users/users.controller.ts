@@ -10,8 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -30,7 +30,7 @@ export class UsersController {
   @Post()
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
-    return new UserEntity(await this.usersService.create(createUserDto));
+    return await this.usersService.create(createUserDto);
   }
 
   @Get()
@@ -38,8 +38,7 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll() {
-    const users = await this.usersService.findAll();
-    return users.map((user) => new UserEntity(user));
+    return await this.usersService.findAll();
   }
 
   @Get(':id')
@@ -47,7 +46,7 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return new UserEntity(await this.usersService.findOne(id));
+    return await this.usersService.findOne(id);
   }
 
   @Patch(':id')
@@ -60,9 +59,7 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @Body() updates: { [key: string]: any },
   ) {
-    return new UserEntity(
-      await this.usersService.update(id, updateUserDto, updates),
-    );
+    return await this.usersService.update(id, updateUserDto, updates);
   }
 
   @Delete(':id')
@@ -70,6 +67,6 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
-    return new UserEntity(await this.usersService.remove(id));
+    return await this.usersService.remove(id);
   }
 }

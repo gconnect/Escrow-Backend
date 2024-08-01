@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { ethers } from 'ethers';
@@ -22,8 +22,7 @@ export class UsersService {
       roundsOfHashing,
     );
     createUserDto.password = hashedPassword;
-
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         username: createUserDto.username,
         email: createUserDto.email,
@@ -37,20 +36,22 @@ export class UsersService {
         },
       },
     });
+    return new UserEntity(user);
   }
 
   async findAll() {
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       include: {
         eoaAccount: true,
         freelancerRequests: true,
         clientRequests: true,
       },
     });
+    return users.map((user) => new UserEntity(user));
   }
 
   async findOne(id: number) {
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
       include: {
         eoaAccount: true,
@@ -58,6 +59,7 @@ export class UsersService {
         freelancerRequests: true,
       },
     });
+    return new UserEntity(user);
   }
 
   async update(
@@ -96,55 +98,18 @@ export class UsersService {
       });
 
       console.log('Updated user:', updatedUser);
-      return updatedUser;
+      return new UserEntity(updatedUser);
     } catch (error) {
       console.error('Error updating user:', error);
       throw new Error('Could not update user');
     }
   }
 
-  // async update(id: number, updateUserDto: UpdateUserDto) {
-  //   if (updateUserDto.password) {
-  //     updateUserDto.password = await bcrypt.hash(
-  //       updateUserDto.password,
-  //       roundsOfHashing,
-  //     );
-  //   }
-  //   console.log('Updating user with data:', {
-  //     id,
-  //     updateUserDto,
-  //   });
-  //   try {
-  //     const { smartWalletAddress } = updateUserDto;
-  //     const updatedUser = await this.prisma.user.update({
-  //       where: { id },
-  //       data: {
-  //         ...updateUserDto,
-  //         eoaAccount: {
-  //           update: {
-  //             data: {
-  //               smartWalletAddress,
-  //             },
-  //           },
-  //         },
-  //       },
-  //       include: {
-  //         eoaAccount: true,
-  //       },
-  //     });
-
-  //     console.log('Updated user:', updatedUser);
-  //     return updatedUser;
-  //   } catch (error) {
-  //     console.error('Error updating user:', error);
-  //     throw new Error('Could not update user');
-  //   }
-  // }
-
   async remove(id: number) {
-    return this.prisma.user.delete({
+    const user = await this.prisma.user.delete({
       where: { id },
       include: { eoaAccount: true },
     });
+    return new UserEntity(user);
   }
 }
