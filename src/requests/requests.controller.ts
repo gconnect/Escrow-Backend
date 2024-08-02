@@ -98,6 +98,11 @@ export class RequestsController {
     return this.requestsService.requestStatus();
   }
 
+  @Get('enums')
+  async getEnums() {
+    return await this.requestsService.getEnums();
+  }
+
   // delete a request
   @Delete(':id')
   @ApiOkResponse({ type: RequestEntity })

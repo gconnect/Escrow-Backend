@@ -1,4 +1,4 @@
-import { Milestone } from '@prisma/client';
+import { Milestone, RequestStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsString, IsNotEmpty } from 'class-validator';
 
@@ -11,11 +11,20 @@ export class MilestoneEntity implements Milestone {
   id: number;
 
   @ApiProperty({
+    description: 'Title of the milestone',
+  })
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @ApiProperty({
     description: 'Description of the milestone',
   })
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  status: RequestStatus;
 
   @ApiProperty({
     description: 'Percentage payment per milestone',
@@ -30,4 +39,14 @@ export class MilestoneEntity implements Milestone {
   @IsNumber()
   @IsNotEmpty()
   requestId: number;
+  
+  @ApiProperty({
+    description: 'Date created',
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    description: 'Date updated',
+  })
+  updatedAt: Date;
 }

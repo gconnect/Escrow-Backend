@@ -1,12 +1,18 @@
 -- CreateEnum
 CREATE TYPE "RequestStatus" AS ENUM ('PENDING', 'ACTIVE', 'INPROGRESS', 'COMPLETED', 'REJECTED');
 
+-- CreateEnum
+CREATE TYPE "ServiceType" AS ENUM ('SOFTWARE_DEVELOPMENT', 'CONTENT_WRITING', 'DIGITAL_MARKETING', 'PRODUCT_MANAGEMENT', 'DATA_ANALYSIS');
+
+-- CreateEnum
+CREATE TYPE "Sex" AS ENUM ('MALE', 'FEMALE', 'OTHERS');
+
 -- CreateTable
 CREATE TABLE "UserEOAAccount" (
     "id" SERIAL NOT NULL,
     "eoaAddress" TEXT NOT NULL,
     "privateKey" TEXT NOT NULL,
-    "smartWalletAddress" TEXT NOT NULL,
+    "smartWalletAddress" TEXT,
     "userId" INTEGER,
 
     CONSTRAINT "UserEOAAccount_pkey" PRIMARY KEY ("id")
@@ -15,9 +21,14 @@ CREATE TABLE "UserEOAAccount" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "username" TEXT NOT NULL,
+    "username" TEXT,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "firstname" TEXT,
+    "lastname" TEXT,
+    "phone" TEXT,
+    "sex" "Sex" DEFAULT 'MALE',
+    "address" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -27,9 +38,13 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Milestone" (
     "id" SERIAL NOT NULL,
+    "title" TEXT,
     "description" TEXT NOT NULL,
     "percent" INTEGER NOT NULL,
+    "status" "RequestStatus" NOT NULL DEFAULT 'PENDING',
     "requestId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Milestone_pkey" PRIMARY KEY ("id")
 );
@@ -37,7 +52,7 @@ CREATE TABLE "Milestone" (
 -- CreateTable
 CREATE TABLE "Request" (
     "id" SERIAL NOT NULL,
-    "serviceType" TEXT NOT NULL,
+    "serviceType" "ServiceType" NOT NULL DEFAULT 'SOFTWARE_DEVELOPMENT',
     "projectDescription" TEXT NOT NULL,
     "additionalDocLinks" TEXT[],
     "isMilestone" BOOLEAN NOT NULL DEFAULT false,
@@ -55,9 +70,6 @@ CREATE TABLE "Request" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserEOAAccount_smartWalletAddress_key" ON "UserEOAAccount"("smartWalletAddress");
-
--- CreateIndex
 CREATE UNIQUE INDEX "UserEOAAccount_userId_key" ON "UserEOAAccount"("userId");
 
 -- CreateIndex
@@ -65,12 +77,6 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Request_clientId_key" ON "Request"("clientId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Request_freelancerId_key" ON "Request"("freelancerId");
 
 -- AddForeignKey
 ALTER TABLE "UserEOAAccount" ADD CONSTRAINT "UserEOAAccount_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

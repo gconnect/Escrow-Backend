@@ -1,3 +1,4 @@
+import { RequestStatus } from '@prisma/client';
 import { IsNumber, IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateMilestoneDto {
@@ -12,4 +13,5 @@ export class CreateMilestoneDto {
   @IsNumber()
   @IsNotEmpty()
   requestId: number;
+
 }

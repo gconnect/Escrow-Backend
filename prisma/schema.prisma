@@ -7,20 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RequestStatus {
+  PENDING
+  ACTIVE
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+enum ServiceType {
+  SOFTWARE_DEVELOPMENT
+  CONTENT_WRITING
+  DIGITAL_MARKETING
+  PRODUCT_MANAGEMENT
+  DATA_ANALYSIS
+}
+
+enum Sex {
+  MALE
+  FEMALE
+  OTHERS
+}
+
 model UserEOAAccount {
-  id                 Int    @id @default(autoincrement())
-  eoaAddress         String 
+  id                 Int     @id @default(autoincrement())
+  eoaAddress         String
   privateKey         String
   smartWalletAddress String?
-  userId             Int?   @unique
-  user               User?  @relation(fields: [userId], references: [id], onDelete: Cascade) //deletes this table data alongside the user
+  userId             Int?    @unique
+  user               User?   @relation(fields: [userId], references: [id], onDelete: Cascade) //deletes this table data alongside the user
 }
 
 model User {
   id                 Int             @id @default(autoincrement())
   username           String          @unique
-  email              String          @unique
+  email              String           @unique
   password           String
+  firstname          String?
+  lastname           String?
+  phone              String?
+  sex                Sex?             
+  address            String?
   eoaAccount         UserEOAAccount?
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
@@ -28,25 +55,21 @@ model User {
   freelancerRequests Request[]       @relation("FreelancerRequests")
 }
 
-enum RequestStatus {
-  PENDING
-  ACTIVE
-  INPROGRESS
-  COMPLETED
-  REJECTED
-}
-
 model Milestone {
-  id          Int     @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
+  title       String?
   description String
   percent     Int
+  status      RequestStatus @default(PENDING)
   requestId   Int
-  request     Request @relation(fields: [requestId], references: [id])
+  request     Request       @relation(fields: [requestId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model Request {
   id                 Int           @id @default(autoincrement())
-  serviceType        String
+  serviceType        ServiceType   @default(SOFTWARE_DEVELOPMENT)
   projectDescription String
   additionalDocLinks String[]
   isMilestone        Boolean       @default(false)
@@ -55,8 +78,8 @@ model Request {
   amount             Float
   completionDate     DateTime
   status             RequestStatus @default(PENDING)
-  clientId           Int           
-  freelancerId       Int           
+  clientId           Int
+  freelancerId       Int
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   client             User          @relation("ClientRequests", fields: [clientId], references: [id])

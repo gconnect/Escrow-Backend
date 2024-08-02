@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { RequestStatus } from '@prisma/client';
+import { RequestStatus, ServiceType } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsNumber,
@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 
 export class CreateRequestDto {
+
   @ApiProperty({ description: 'Client id' })
   @IsNumber()
   clientId: number;
@@ -23,13 +24,13 @@ export class CreateRequestDto {
   amount: number;
 
   // @ApiProperty({ description: 'Status of the request' })
-  @Transform(({ value }) => (value === undefined ? 0 : value))
+  // @Transform(({ value }) => (value === undefined ? 0 : value))
   status: RequestStatus;
 
   @ApiProperty({ description: 'Type of service' })
   @IsString()
   @IsNotEmpty()
-  serviceType: string;
+  serviceType: ServiceType;
 
   @ApiProperty({ description: 'Service description with' })
   @IsString()

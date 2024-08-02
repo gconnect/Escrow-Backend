@@ -1,4 +1,4 @@
-import { Milestone, Request, RequestStatus } from '@prisma/client';
+import { Milestone, Request, RequestStatus, ServiceType } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNumber,
@@ -29,9 +29,9 @@ export class RequestEntity implements Request {
   freelancerId: number;
 
   @ApiProperty({ description: 'Type of service' })
-  @IsString()
-  @IsNotEmpty()
-  serviceType: string;
+  // @IsString()
+  // @IsNotEmpty()
+  serviceType: ServiceType;
 
   @ApiProperty({ description: 'Service description with' })
   @IsString()
@@ -43,7 +43,7 @@ export class RequestEntity implements Request {
   amount: number;
 
   @ApiProperty({ description: 'Status of the request' })
-  @Transform(({ value }) => (value === undefined ? 0 : value))
+  // @Transform(({ value }) => (value === undefined ? 0 : value))
   status: RequestStatus;
 
   @ApiProperty({ description: 'Provide additional links about the project' })

@@ -7,7 +7,7 @@ import { RequestEntity } from './entities/request.entity';
 import { CustomException } from 'src/utils/custom.exception';
 import { REQUEST_STATUS, SERVICE_TYPES } from 'src/utils/constants';
 import { UsersService } from 'src/users/users.service';
-import { User } from '@prisma/client';
+import { RequestStatus, User, Sex, ServiceType } from '@prisma/client';
 
 @Injectable()
 export class RequestsService {
@@ -126,7 +126,7 @@ export class RequestsService {
     }
   }
 
-  async serviceTypes() {
+  serviceTypes(): string[] {
     try {
       return SERVICE_TYPES;
     } catch (error) {
@@ -134,12 +134,20 @@ export class RequestsService {
     }
   }
 
-  async requestStatus() {
+  requestStatus(): string[] {
     try {
       return REQUEST_STATUS;
     } catch (error) {
       throw new Error(error);
     }
+  }
+
+  async getEnums() {
+    return {
+      requestStatus: Object.values(RequestStatus),
+      serviceTypes: Object.values(ServiceType),
+      sexes: Object.values(Sex),
+    };
   }
 
   async remove(id: number) {

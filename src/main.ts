@@ -11,7 +11,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Escrow Dapp')
-    .setDescription('The Median API description')
+    .setDescription('The Escrow API description')
     .setVersion('0.1')
     .addBearerAuth()
     .build();
