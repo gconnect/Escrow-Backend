@@ -5,10 +5,13 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import { MilestoneEntity } from '../milestones/entities/milestone.entity';
 import { RequestEntity } from './entities/request.entity';
 import { CustomException } from 'src/utils/custom.exception';
+import { REQUEST_STATUS, SERVICE_TYPES } from 'src/utils/constants';
+import { UsersService } from 'src/users/users.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class RequestsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private users: UsersService) {}
 
   async create(createRequestDto: CreateRequestDto) {
     try {
@@ -23,6 +26,34 @@ export class RequestsService {
       return new RequestEntity(request);
     } catch (error) {
       throw new CustomException('Error creating request', error);
+    }
+  }
+  async findUserRequests(id: number) {
+    try {
+      const user = await this.users.findOne(id);
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      const requests = this.prisma.request.findMany({
+        where: { OR: [{ clientId: user.id }, { freelancerId: user.id }] },
+        include: {
+          milestones: true,
+          client: true,
+          freelancer: true,
+        },
+      });
+      return (await requests).map((request) => {
+        return new RequestEntity({
+          ...request,
+          client: new UserEntity(request.client),
+          freelancer: new UserEntity(request.freelancer),
+          milestones: request.milestones.map(
+            (milestone) => new MilestoneEntity(milestone),
+          ),
+        });
+      });
+    } catch (error) {
+      throw new Error(error);
     }
   }
 
@@ -92,6 +123,22 @@ export class RequestsService {
     } catch (error) {
       console.error('Error updating request:', error);
       throw new CustomException('Could not update request', error);
+    }
+  }
+
+  async serviceTypes() {
+    try {
+      return SERVICE_TYPES;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async requestStatus() {
+    try {
+      return REQUEST_STATUS;
+    } catch (error) {
+      throw new Error(error);
     }
   }
 

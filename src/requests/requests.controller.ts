@@ -27,6 +27,8 @@ import { UpdateRequestDto } from './dtos/update-request.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RequestsService } from './requests.service';
 import { AdminGuard } from 'src/utils/admin.guard';
+import { get } from 'http';
+import { SERVICE_TYPES } from 'src/utils/constants';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -48,6 +50,12 @@ export class RequestsController {
   @Post()
   async create(@Body() createRequestDto: CreateRequestDto) {
     return await this.requestsService.create(createRequestDto);
+  }
+
+  @Get('users/:id')
+  @ApiOkResponse({ type: RequestEntity, isArray: true })
+  async findUserRequests(@Param('id', ParseIntPipe) id: number) {
+    return await this.requestsService.findUserRequests(id);
   }
 
   // fetch all requests
@@ -76,6 +84,18 @@ export class RequestsController {
     @Body() updates: { [key: string]: any },
   ) {
     return await this.requestsService.update(id, updates);
+  }
+
+  @ApiOkResponse({ type: Array<string>, isArray: true })
+  @Get('service-types')
+  serviceTypes() {
+    return this.requestsService.serviceTypes();
+  }
+
+  @ApiOkResponse({ type: Array<string>, isArray: true })
+  @Get('request-status')
+  requestStatus() {
+    return this.requestsService.requestStatus();
   }
 
   // delete a request
