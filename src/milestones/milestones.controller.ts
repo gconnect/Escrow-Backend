@@ -23,6 +23,7 @@ import {
 import { CreateMilestoneDto } from 'src/milestones/dtos/create-milestone.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AdminGuard } from 'src/utils/admin.guard';
+import { id } from 'ethers';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -42,6 +43,12 @@ export class MilestonesController {
   @ApiCreatedResponse({ type: MilestoneEntity })
   async create(@Body() createMilestoneDto: CreateMilestoneDto) {
     return await this.milestoneService.create(createMilestoneDto);
+  }
+  
+  @Get('requests/:id')
+  @ApiOkResponse({ type: MilestoneEntity, isArray: true })
+  async findRequestMilestones(@Param('id', ParseIntPipe) id: number) {
+    return await this.milestoneService.findRequestMilestones(id);
   }
 
   // fetch all requests

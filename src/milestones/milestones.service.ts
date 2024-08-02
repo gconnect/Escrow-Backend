@@ -9,12 +9,14 @@ import { CreateMilestoneDto } from 'src/milestones/dtos/create-milestone.dto';
 import { MilestoneEntity } from 'src/milestones/entities/milestone.entity';
 import { RequestsService } from 'src/requests/requests.service';
 import { CustomException } from 'src/utils/custom.exception';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class MilestonesService {
   constructor(
     private prisma: PrismaService,
     private requests: RequestsService,
+    private users: UsersService,
   ) {}
 
   async create(createMilestonDto: CreateMilestoneDto) {
@@ -37,6 +39,30 @@ export class MilestonesService {
       new MilestoneEntity(milestone);
     } catch (error) {
       throw new CustomException('Error creating milestone', error);
+    }
+  }
+
+  async findRequestMilestones(id: number) {
+    const request = await this.requests.findOne(id);
+    if (!request) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    try {
+      const milestones = this.prisma.milestone.findMany({
+        where: {
+          requestId: request.id,
+        },
+        include: {
+          request: true,
+        },
+      });
+      return (await milestones).map((milestone) => {
+        return new MilestoneEntity({
+          ...milestone,
+        });
+      });
+    } catch (error) {
+      throw error;
     }
   }
 

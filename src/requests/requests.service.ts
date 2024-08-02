@@ -53,7 +53,7 @@ export class RequestsService {
         });
       });
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
 
