@@ -3,15 +3,16 @@ services:
 
   postgres:
     image: postgres:latest
-    container_name: prisma_postgres_db
+    container_name: nest_prisma_postgres
     restart: always
     environment:
+      - POSTGRES_DB = mydb
       - POSTGRES_USER=myuser
       - POSTGRES_PASSWORD=mypassword
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '5433:5432'
 
 volumes:
   postgres:

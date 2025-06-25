@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { ethers } from 'ethers';
 import { UserEntity } from './entities/user.entity';
 import { CustomException } from 'src/utils/custom.exception';
@@ -42,7 +42,8 @@ export class UsersService {
       });
       return new UserEntity(user);
     } catch (error) {
-      throw new CustomException('Error creating account', error);
+      console.log(error)
+      throw new CustomException('Error creating account', error.message);
     }
   }
 
