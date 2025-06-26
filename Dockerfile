@@ -13,6 +13,9 @@ COPY . .
 
 RUN npm run build
 
+# Verify build output
+RUN ls -la /app/dist 
+
 FROM node:18-alpine
 
 WORKDIR /app
@@ -24,7 +27,10 @@ RUN npm ci --only=production
 RUN npx prisma generate
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
 
+# Verify copied files
+RUN ls -la /app/dist  # Debugging line
 EXPOSE 8080
 
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/main"]
