@@ -1,0 +1,32 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '--platform=linux/amd64', '-t', 'gcr.io/$PROJECT_ID/$_SERVICE_NAME', '.']
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/$_SERVICE_NAME']
+
+  - name: 'gcr.io/$PROJECT_ID/$_SERVICE_NAME'
+    args: ['npx', 'prisma', 'migrate', 'deploy']
+    env:
+      - 'DATABASE_URL=$$DB_URL'
+    secretEnv: ['DB_URL']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args:
+      - 'gcloud'
+      - 'run'
+      - 'deploy'
+      - '$_SERVICE_NAME'
+      - '--update-secrets=DB_PASSWORD=DB_PASSWORD:latest,JWT_SECRET=JWT_SECRET:latest'
+      - '--set-env-vars=DB_USER=postgres,DB_NAME=escrowdb'
+      - '--image=gcr.io/$PROJECT_ID/$_SERVICE_NAME'
+      - '--platform=managed'
+      - '--region=$_REGION'
+    secretEnv: ['DB_PASSWORD', 'JWT_SECRET']
+secrets:
+  - kmsKeyName: projects/$PROJECT_ID/locations/global/keyRings/$KEY_RING/cryptoKeys/$KEY
+    secretEnv:
+      DB_URL: 'your-encrypted-db-url-here'
+
+options:
+  substitution_option: 'ALLOW_LOOSE'

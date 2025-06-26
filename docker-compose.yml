@@ -1,18 +1,35 @@
-version: '3.8'
 services:
-
   postgres:
-    image: postgres:latest
+    image: postgres:13-alpine
     container_name: nest_prisma_postgres
-    restart: always
     environment:
-      - POSTGRES_DB = mydb
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - '5433:5432'
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: nest_app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://myuser:mypassword@postgres:5432/mydb"
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
-  postgres:
+  postgres_data:
