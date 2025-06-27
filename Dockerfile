@@ -22,9 +22,9 @@ COPY --from=builder /app/prisma ./prisma
 
 RUN npx prisma generate
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
+#   CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 EXPOSE 8080
 
-CMD ["node", "dist/src/main.js"]
+CMD ["node", "dist/main.js"]
