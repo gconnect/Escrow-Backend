@@ -37,7 +37,7 @@ export class UsersService {
           },
         },
         include: {
-          eoaAccount: true,
+          eoaAccount: false,
         },
       });
       return new UserEntity(user);
